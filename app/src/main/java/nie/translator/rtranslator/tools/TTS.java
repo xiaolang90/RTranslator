@@ -58,12 +58,12 @@ public class TTS {
                                 ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
                                 for (int i = 0; i < engines.size() && !found; i++) {
                                     if (engines.get(i).name.equals("com.google.android.tts")) {
-                                        found = true;
+                                        found = true; // Check Google TTS here.
                                     }
                                     else if (engines.get(i).name.equals("com.samsung.SMT")) {
                                         found = true;
-                                    }
-                                }
+                                    } // Check TTS engine from samsung here.
+                                } // Look forward to supporting more TTS engine.
                                 if (!found) {
                                     tts = null;
                                     listener.onError(ErrorCodes.MISSING_GOOGLE_TTS);
@@ -212,10 +212,10 @@ public class TTS {
                                 int i = aSet.getLocale().toString().indexOf("-");
                                 CustomLocale language;
                                 if (i != -1) {
-                                    language = new CustomLocale(aSet.getLocale());
+                                    language = new CustomLocale(aSet.getLocale()); // Use Google TTS's .getLocale()
                                 }
                                 else {
-                                    language = CustomLocale.getInstance(aSet.getName());
+                                    language = CustomLocale.getInstance(aSet.getName()); // Use getName for SMT because Samsung use another Locale format (as "eng_USA_l03") and use Google's Locale format as its name (as "en-US-SMTl03").
                                 }
                                 ttsLanguages.add(language);
                             }
