@@ -200,7 +200,7 @@ public class TTS {
                     if (qualityLow) {
                         quality = Voice.QUALITY_VERY_LOW;
                     } else {
-                        quality = Voice.QUALITY_HIGH;
+                        quality = Voice.QUALITY_NORMAL;
                     }
                     if (set != null) {
                         // we filter the languages that have a tts that reflects the quality characteristics we want
