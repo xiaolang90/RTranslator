@@ -174,7 +174,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
         firstResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) {
+                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) { // check if the text can be speak
                     speak(text, languageOfText);
                 }
                 GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, true, isFinal);
@@ -182,7 +182,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
                 // we save every new message in the exchanged messages so that the fragment can restore them
                 WalkieTalkieService.super.addOrUpdateMessage(message);
                 //if the tts is not active we restart the mic here
-                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){
+                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){ // initialize to receive next text
                     startVoiceRecorder();
                     notifyMicProgrammaticallyStarted();
                 }
@@ -201,7 +201,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
         secondResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) {
+                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) { // check if the language can be speak
                     speak(text, languageOfText);
                 }
                 GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, false, isFinal);
@@ -209,7 +209,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
                 // we save every new message in the exchanged messages so that the fragment can restore them
                 WalkieTalkieService.super.addOrUpdateMessage(message);
                 //if the tts is not active we restart the mic here
-                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){
+                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){ // initialize to receive next text
                     startVoiceRecorder();
                     notifyMicProgrammaticallyStarted();
                 }

@@ -166,7 +166,7 @@ public class ConversationService extends VoiceTranslationService {
                         translator.translateMessage(conversationMessage, result, TRANSLATOR_BEAM_SIZE, new Translator.TranslateMessageListener() {
                             @Override
                             public void onTranslatedMessage(ConversationMessage conversationMessage, long messageID, boolean isFinal) {
-                                if(isFinal && TTS.ttsLanguages.contains(conversationMessage.getPayload().getLanguage())) {
+                                if(isFinal && TTS.ttsLanguages.contains(conversationMessage.getPayload().getLanguage())) { // check if the language can be speak
                                     speak(conversationMessage.getPayload().getText(), conversationMessage.getPayload().getLanguage());
                                 }
                                 message.setText(conversationMessage.getPayload().getText());   // updating the text with the new translated text (and without the language code)

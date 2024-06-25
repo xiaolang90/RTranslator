@@ -57,15 +57,17 @@ public class TTS {
                             if (tts != null) {
                                 ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
                                 for (int i = 0; i < engines.size() && !found; i++) {
-                                    if (engines.get(i).name.equals("com.google.android.tts")) {
-                                        found = true; // Check Google TTS here.
+                                    switch (engines.get(i).name) {
+                                        case "com.google.android.tts":
+                                            found = true; // Check Google TTS here.
+                                            break;
+                                        case "com.samsung.SMT": // Check Samsung TTS here.
+                                            found = true;
+                                            break;
+                                        case "com.huawei.hiai": // Check Huawei TTS here.
+                                            found = true;
+                                            break;
                                     }
-                                    else if (engines.get(i).name.equals("com.samsung.SMT")) {
-                                        found = true;
-                                    } // Check TTS engine from samsung here.
-                                    else if (engines.get(i).name.equals("com.huawei.hiai")) {
-                                        found = true;
-                                    } // Check TTS engine from huawei here.
                                 } // Look forward to supporting more TTS engine.
                                 if (!found) {
                                     tts = null;
@@ -177,7 +179,7 @@ public class TTS {
         }
     }
 
-    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
+    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>(); // Change TTS language list to public
 
     private static class GetSupportedLanguageRunnable implements Runnable {
         private SupportedLanguagesListener responseListener;
@@ -200,26 +202,23 @@ public class TTS {
                 public void onInit() {
                     Set<Voice> set = tempTts.getVoices();
                     SharedPreferences sharedPreferences = context.getSharedPreferences("default", Context.MODE_PRIVATE);
-                    boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", true); // Change default to true otherwise Japanese won't work by default
+                    boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", false);
                     int quality;
                     if (qualityLow) {
                         quality = Voice.QUALITY_VERY_LOW;
                     } else {
-                        quality = Voice.QUALITY_HIGH;
+                        quality = Voice.QUALITY_NORMAL;
                     }
                     if (set != null) {
                         // we filter the languages that have a tts that reflects the quality characteristics we want
                         for (Voice aSet : set) {
-                            int voice_quality = aSet.getQuality();
-                            int quality_thresh = quality;
-                            if (voice_quality >= quality_thresh && !aSet.getFeatures().contains("legacySetLanguageVoice")) { //
+                            if (aSet.getQuality() >= quality && !aSet.getFeatures().contains("legacySetLanguageVoice")) { //
                                 int i = aSet.getLocale().toString().indexOf("-");
                                 CustomLocale language;
                                 if (i != -1) {
-                                    language = new CustomLocale(aSet.getLocale()); // Use Google TTS's .getLocale()
-                                }
-                                else {
-                                    language = CustomLocale.getInstance(aSet.getName()); // Use getName for SMT because Samsung use another Locale format (as "eng_USA_l03") and use Google's Locale format as its name (as "en-US-SMTl03").
+                                    language = new CustomLocale(aSet.getLocale()); // Use .getLocale() for google
+                                } else {
+                                    language = CustomLocale.getInstance(aSet.getName()); // Use .getName() for samsung/huawei because their Locale format (as "eng_USA_l03" or "zh_#Hans") don't have "-" as Google's Locale format (as "en-US-SMTl03").
                                 }
                                 ttsLanguages.add(language);
                             }
