@@ -17,6 +17,7 @@
 package nie.translator.rtranslator.settings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.AttributeSet;
 import androidx.annotation.NonNull;
 import androidx.preference.Preference;
@@ -57,6 +58,12 @@ public class SupportTtsQualityPreference extends SwitchPreference {
         setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if(global != null) {
+                    final SharedPreferences sharedPreferences = global.getSharedPreferences("default", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("languagesQualityLow", (Boolean) newValue);
+                    editor.apply();
+                }
                 if (fragment != null) {
                     //download new languages
                     downloadLanguages();
@@ -67,30 +74,32 @@ public class SupportTtsQualityPreference extends SwitchPreference {
     }
 
     public void downloadLanguages() {
-        global.getLanguages(false, true, new Global.GetLocalesListListener() {
-            @Override
-            public void onSuccess(ArrayList<CustomLocale> result) {
-                fragment.removeDownload();
-                fragment.getLanguagePreference().initializeLanguagesList();
-            }
+        if(global != null && fragment != null) {
+            global.getLanguages(false, true, new Global.GetLocalesListListener() {
+                @Override
+                public void onSuccess(ArrayList<CustomLocale> result) {
+                    fragment.removeDownload();
+                    fragment.getLanguagePreference().initializeLanguagesList();
+                }
 
-            @Override
-            public void onFailure(int[] reasons, long value) {
-                for (int aReason : reasons) {
-                    switch (aReason) {
-                        case ErrorCodes.MISSED_ARGUMENT:
-                        case ErrorCodes.SAFETY_NET_EXCEPTION:
-                        case ErrorCodes.MISSED_CONNECTION:
-                            fragment.onFailure(new int[]{aReason}, value, SettingsFragment.DOWNLOAD_LANGUAGES, null);
-                            break;
-                        default:
-                            activity.onError(aReason, value);
-                            break;
+                @Override
+                public void onFailure(int[] reasons, long value) {
+                    for (int aReason : reasons) {
+                        switch (aReason) {
+                            case ErrorCodes.MISSED_ARGUMENT:
+                            case ErrorCodes.SAFETY_NET_EXCEPTION:
+                            case ErrorCodes.MISSED_CONNECTION:
+                                fragment.onFailure(new int[]{aReason}, value, SettingsFragment.DOWNLOAD_LANGUAGES, null);
+                                break;
+                            default:
+                                activity.onError(aReason, value);
+                                break;
+                        }
                     }
                 }
-            }
-        });
-        fragment.addDownload();
+            });
+            fragment.addDownload();
+        }
     }
 
     public void setFragment(@NonNull SettingsFragment fragment) {
