@@ -19,7 +19,6 @@ package nie.translator.rtranslator.voice_translation._walkie_talkie_mode._walkie
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
@@ -174,7 +173,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
         firstResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) { // check if the text can be speak
+                if(isFinal && CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText)) { // check if the text can be speak
                     speak(text, languageOfText);
                 }
                 GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, true, isFinal);
@@ -201,7 +200,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
         secondResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && TTS.ttsLanguages.contains(languageOfText)) { // check if the language can be speak
+                if(isFinal && CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText)) { // check if the text can be speak
                     speak(text, languageOfText);
                 }
                 GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, false, isFinal);
