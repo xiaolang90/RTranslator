@@ -53,31 +53,30 @@ public class TTS {
                         }
                     }*/
 
-                            boolean found = false;    //method 2
-                            if (tts != null) {
-                                ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
-                                for (int i = 0; i < engines.size() && !found; i++) {
-                                    if (engines.get(i).name.equals("com.google.android.tts")) {
-                                        found = true; // Check Google TTS here.
-                                    }
-                                    else if (engines.get(i).name.equals("com.samsung.SMT")) {
-                                        found = true;
-                                    } // Check TTS engine from samsung here.
-                                } // Look forward to supporting more TTS engine.
-                                if (!found) {
-                                    tts = null;
-                                    listener.onError(ErrorCodes.MISSING_GOOGLE_TTS);
-                                } else {
-                                    listener.onInit();
-                                }
-                                return;
-                            }
+                    boolean found = false;    //method 2
+                    if (tts != null) {
+                        ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
+                        for (int i = 0; i < engines.size() && !found; i++) {
+                            if (engines.get(i).name.equals("com.google.android.tts")) {
+                                found = true; // Check Google TTS here.
+                            } else if (engines.get(i).name.equals("com.samsung.SMT")) {
+                                found = true;
+                            } // Check TTS engine from samsung here.
+                        } // Look forward to supporting more TTS engine.
+                        if (!found) {
+                            tts = null;
+                            listener.onError(ErrorCodes.MISSING_GOOGLE_TTS);
+                        } else {
+                            listener.onInit();
                         }
-                        tts = null;
-                        listener.onError(ErrorCodes.GOOGLE_TTS_ERROR);
+                        return;
                     }
-                },
-                null);// "com.google.android.tts" is Google TTS and "com.samsung.SMT" is Samsung TTS
+                }
+                tts = null;
+                listener.onError(ErrorCodes.GOOGLE_TTS_ERROR);
+            }
+        },
+        null);// "com.google.android.tts" is Google TTS and "com.samsung.SMT" is Samsung TTS
     }
 
     public boolean isActive() {
@@ -196,7 +195,7 @@ public class TTS {
                     ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
                     Set<Voice> set = tempTts.getVoices();
                     SharedPreferences sharedPreferences = context.getSharedPreferences("default", Context.MODE_PRIVATE);
-                    boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", true); // Change default to true otherwise Japanese won't work by default
+                    boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", false);
                     int quality;
                     if (qualityLow) {
                         quality = Voice.QUALITY_VERY_LOW;
@@ -206,9 +205,7 @@ public class TTS {
                     if (set != null) {
                         // we filter the languages that have a tts that reflects the quality characteristics we want
                         for (Voice aSet : set) {
-                            int voice_quality = aSet.getQuality();
-                            int quality_thresh = quality;
-                            if (voice_quality >= quality_thresh && !aSet.getFeatures().contains("legacySetLanguageVoice")) { //
+                            if (aSet.getQuality() >= quality && !aSet.getFeatures().contains("legacySetLanguageVoice")) { //
                                 int i = aSet.getLocale().toString().indexOf("-");
                                 CustomLocale language;
                                 if (i != -1) {
