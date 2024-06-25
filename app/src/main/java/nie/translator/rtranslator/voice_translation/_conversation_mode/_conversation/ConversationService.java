@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.tools.BluetoothHeadsetUtils;
 import nie.translator.rtranslator.tools.CustomLocale;
+import nie.translator.rtranslator.tools.TTS;
 import nie.translator.rtranslator.tools.Tools;
 import nie.translator.rtranslator.tools.gui.messages.GuiMessage;
 import nie.translator.rtranslator.tools.gui.peers.GuiPeer;
@@ -165,7 +166,7 @@ public class ConversationService extends VoiceTranslationService {
                         translator.translateMessage(conversationMessage, result, TRANSLATOR_BEAM_SIZE, new Translator.TranslateMessageListener() {
                             @Override
                             public void onTranslatedMessage(ConversationMessage conversationMessage, long messageID, boolean isFinal) {
-                                if(isFinal) {
+                                if(isFinal && TTS.ttsLanguages.contains(conversationMessage.getPayload().getLanguage())) {
                                     speak(conversationMessage.getPayload().getText(), conversationMessage.getPayload().getLanguage());
                                 }
                                 message.setText(conversationMessage.getPayload().getText());   // updating the text with the new translated text (and without the language code)

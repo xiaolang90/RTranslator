@@ -63,6 +63,9 @@ public class TTS {
                                     else if (engines.get(i).name.equals("com.samsung.SMT")) {
                                         found = true;
                                     } // Check TTS engine from samsung here.
+                                    else if (engines.get(i).name.equals("com.huawei.hiai")) {
+                                        found = true;
+                                    } // Check TTS engine from huawei here.
                                 } // Look forward to supporting more TTS engine.
                                 if (!found) {
                                     tts = null;
@@ -174,6 +177,8 @@ public class TTS {
         }
     }
 
+    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
+
     private static class GetSupportedLanguageRunnable implements Runnable {
         private SupportedLanguagesListener responseListener;
         private Context context;
@@ -193,7 +198,6 @@ public class TTS {
             tempTts = new TTS((context), new TTS.InitListener() {    // tts initialization (to be improved, automatic package installation)
                 @Override
                 public void onInit() {
-                    ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
                     Set<Voice> set = tempTts.getVoices();
                     SharedPreferences sharedPreferences = context.getSharedPreferences("default", Context.MODE_PRIVATE);
                     boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", true); // Change default to true otherwise Japanese won't work by default

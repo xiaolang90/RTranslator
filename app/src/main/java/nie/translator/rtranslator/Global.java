@@ -157,7 +157,7 @@ public class Global extends Application implements DefaultLifecycleObserver {
                     //we return only the languages compatible with the speech recognizer, the translator and the tts
                     final ArrayList<CustomLocale> compatibleLanguages = new ArrayList<>();
                     for (CustomLocale translatorLanguage : translatorLanguages) {
-                        if (CustomLocale.containsLanguage(ttsLanguages, translatorLanguage) && CustomLocale.containsLanguage(speechRecognizerLanguages, translatorLanguage)) {
+                        if (CustomLocale.containsLanguage(speechRecognizerLanguages, translatorLanguage)) { // CustomLocale.containsLanguage(ttsLanguages, translatorLanguage) &&
                             compatibleLanguages.add(translatorLanguage);
                         }
                     }
