@@ -117,34 +117,6 @@ public class Global extends Application implements DefaultLifecycleObserver {
         });
     }
 
-    public void getLanguages(final boolean recycleResult, final GetLocalesListListener responseListener) {
-        if (recycleResult && !languages.isEmpty()) {
-            responseListener.onSuccess(languages);
-        } else {
-            TTS.getSupportedLanguages(this, new TTS.SupportedLanguagesListener() {
-                @Override
-                public void onLanguagesListAvailable(ArrayList<CustomLocale> ttsLanguages) {
-                    ArrayList<CustomLocale> translatorLanguages = Translator.getSupportedLanguages(Global.this, Translator.NLLB);
-                    ArrayList<CustomLocale> speechRecognizerLanguages = Recognizer.getSupportedLanguages(Global.this);
-                    //we return only the languages compatible with the speech recognizer, the translator and the tts
-                    final ArrayList<CustomLocale> compatibleLanguages = new ArrayList<>();
-                    for (CustomLocale translatorLanguage : translatorLanguages) {
-                        if (CustomLocale.containsLanguage(ttsLanguages, translatorLanguage) && CustomLocale.containsLanguage(speechRecognizerLanguages, translatorLanguage)) {
-                            compatibleLanguages.add(translatorLanguage);
-                        }
-                    }
-                    languages = compatibleLanguages;
-                    responseListener.onSuccess(compatibleLanguages);
-                }
-
-                @Override
-                public void onError(int reason) {
-                    responseListener.onFailure(new int[]{reason}, 0);
-                }
-            });
-        }
-    }
-
     public void getLanguages(final boolean recycleResult, boolean ignoreTTSError,final GetLocalesListListener responseListener) {
         if (recycleResult && !languages.isEmpty()) {
             responseListener.onSuccess(languages);

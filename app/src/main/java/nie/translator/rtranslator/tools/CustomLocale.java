@@ -154,7 +154,11 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
     }
 
     public String getDisplayName() {
-        return locale.getDisplayName();
+        if (containsLanguage(TTS.ttsLanguages, CustomLocale.getInstance(locale.getLanguage()))) {
+            return locale.getDisplayName();
+        } else {
+            return locale.getDisplayName()+" (No Text-to-Speech)"; // Notice that users cannot use TTS for this language.
+        }
     }
 
     public String getDisplayName(Locale locale) {
