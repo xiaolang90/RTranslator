@@ -181,7 +181,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
                 // we save every new message in the exchanged messages so that the fragment can restore them
                 WalkieTalkieService.super.addOrUpdateMessage(message);
                 //if the tts is not active we restart the mic here
-                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){ // initialize to receive next text
+                if(tts == null || !CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
                     startVoiceRecorder();
                     notifyMicProgrammaticallyStarted();
                 }
@@ -208,7 +208,7 @@ public class WalkieTalkieService extends VoiceTranslationService {
                 // we save every new message in the exchanged messages so that the fragment can restore them
                 WalkieTalkieService.super.addOrUpdateMessage(message);
                 //if the tts is not active we restart the mic here
-                if(tts == null || !TTS.ttsLanguages.contains(languageOfText) || !tts.isActive() || isAudioMute){ // initialize to receive next text
+                if(tts == null || !CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
                     startVoiceRecorder();
                     notifyMicProgrammaticallyStarted();
                 }
