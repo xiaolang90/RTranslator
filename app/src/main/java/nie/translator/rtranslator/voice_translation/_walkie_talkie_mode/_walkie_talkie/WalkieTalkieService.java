@@ -173,18 +173,28 @@ public class WalkieTalkieService extends VoiceTranslationService {
         firstResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText)) { // check if the text can be speak
-                    speak(text, languageOfText);
-                }
-                GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, true, isFinal);
-                WalkieTalkieService.super.notifyMessage(message);
-                // we save every new message in the exchanged messages so that the fragment can restore them
-                WalkieTalkieService.super.addOrUpdateMessage(message);
-                //if the tts is not active we restart the mic here
-                if(tts == null || !CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
-                    startVoiceRecorder();
-                    notifyMicProgrammaticallyStarted();
-                }
+                ((Global) getApplication()).getTTSLanguages(true, new Global.GetLocalesListListener() {
+                    @Override
+                    public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                        if(isFinal && CustomLocale.containsLanguage(ttsLanguages, languageOfText)) { // check if the text can be speak
+                            speak(text, languageOfText);
+                        }
+                        GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, true, isFinal);
+                        WalkieTalkieService.super.notifyMessage(message);
+                        // we save every new message in the exchanged messages so that the fragment can restore them
+                        WalkieTalkieService.super.addOrUpdateMessage(message);
+                        //if the tts is not active we restart the mic here
+                        if(tts == null || !CustomLocale.containsLanguage(ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
+                            startVoiceRecorder();
+                            notifyMicProgrammaticallyStarted();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int[] reasons, long value) {
+                        //never called in this case
+                    }
+                });
             }
 
             @Override
@@ -200,18 +210,28 @@ public class WalkieTalkieService extends VoiceTranslationService {
         secondResultTranslateListener = new Translator.TranslateListener() {
             @Override
             public void onTranslatedText(String text, long resultID, boolean isFinal, CustomLocale languageOfText) {
-                if(isFinal && CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText)) { // check if the text can be speak
-                    speak(text, languageOfText);
-                }
-                GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, false, isFinal);
-                WalkieTalkieService.super.notifyMessage(message);
-                // we save every new message in the exchanged messages so that the fragment can restore them
-                WalkieTalkieService.super.addOrUpdateMessage(message);
-                //if the tts is not active we restart the mic here
-                if(tts == null || !CustomLocale.containsLanguage(TTS.ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
-                    startVoiceRecorder();
-                    notifyMicProgrammaticallyStarted();
-                }
+                ((Global) getApplication()).getTTSLanguages(true, new Global.GetLocalesListListener() {
+                    @Override
+                    public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                        if(isFinal && CustomLocale.containsLanguage(ttsLanguages, languageOfText)) { // check if the text can be speak
+                            speak(text, languageOfText);
+                        }
+                        GuiMessage message = new GuiMessage(new Message(WalkieTalkieService.this, text), resultID, false, isFinal);
+                        WalkieTalkieService.super.notifyMessage(message);
+                        // we save every new message in the exchanged messages so that the fragment can restore them
+                        WalkieTalkieService.super.addOrUpdateMessage(message);
+                        //if the tts is not active we restart the mic here
+                        if(tts == null || !CustomLocale.containsLanguage(ttsLanguages, languageOfText) || !tts.isActive() || isAudioMute){
+                            startVoiceRecorder();
+                            notifyMicProgrammaticallyStarted();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int[] reasons, long value) {
+                        //never called in this case
+                    }
+                });
             }
 
             @Override

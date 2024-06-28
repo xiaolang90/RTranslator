@@ -606,6 +606,7 @@ public class Recognizer extends NeuralNetworkApi {
                 return START_TOKEN_ID + i + 1;
             }
         }
+        Log.e("error", "Error Converting Language code " + language + " to Whisper code");
         return -1;
     }
 

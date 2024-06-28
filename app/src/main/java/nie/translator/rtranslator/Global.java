@@ -51,6 +51,7 @@ import nie.translator.rtranslator.voice_translation.neural_networks.voice.Record
 
 public class Global extends Application implements DefaultLifecycleObserver {
     private ArrayList<CustomLocale> languages = new ArrayList<>();
+    private ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
     private CustomLocale language;
     private CustomLocale firstLanguage;
     private CustomLocale secondLanguage;
@@ -117,16 +118,16 @@ public class Global extends Application implements DefaultLifecycleObserver {
         });
     }
 
-    public void getLanguages(final boolean recycleResult, boolean ignoreTTSError,final GetLocalesListListener responseListener) {
+    public void getLanguages(final boolean recycleResult, boolean ignoreTTSError, final GetLocalesListListener responseListener) {
         if (recycleResult && !languages.isEmpty()) {
             responseListener.onSuccess(languages);
         } else {
-            TTS.getSupportedLanguages(this, new TTS.SupportedLanguagesListener() {
+            TTS.getSupportedLanguages(this, new TTS.SupportedLanguagesListener() {    //we load TTS languages to catch eventual TTS errors
                 @Override
                 public void onLanguagesListAvailable(ArrayList<CustomLocale> ttsLanguages) {
                     ArrayList<CustomLocale> translatorLanguages = Translator.getSupportedLanguages(Global.this, Translator.NLLB);
                     ArrayList<CustomLocale> speechRecognizerLanguages = Recognizer.getSupportedLanguages(Global.this);
-                    //we return only the languages compatible with the speech recognizer, the translator and the tts
+                    //we return only the languages compatible with the speech recognizer and the translator
                     final ArrayList<CustomLocale> compatibleLanguages = new ArrayList<>();
                     for (CustomLocale translatorLanguage : translatorLanguages) {
                         if (CustomLocale.containsLanguage(speechRecognizerLanguages, translatorLanguage)) {
@@ -142,7 +143,7 @@ public class Global extends Application implements DefaultLifecycleObserver {
                     if(ignoreTTSError) {
                         ArrayList<CustomLocale> translatorLanguages = Translator.getSupportedLanguages(Global.this, Translator.NLLB);
                         ArrayList<CustomLocale> speechRecognizerLanguages = Recognizer.getSupportedLanguages(Global.this);
-                        //we return only the languages compatible with the speech recognizer, the translator and the tts
+                        //we return only the languages compatible with the speech recognizer and the translator (without loading TTS languages)
                         final ArrayList<CustomLocale> compatibleLanguages = new ArrayList<>();
                         for (CustomLocale translatorLanguage : translatorLanguages) {
                             if (CustomLocale.containsLanguage(speechRecognizerLanguages, translatorLanguage)) {
@@ -154,6 +155,25 @@ public class Global extends Application implements DefaultLifecycleObserver {
                     }else{
                         responseListener.onFailure(new int[]{reason}, 0);
                     }
+                }
+            });
+        }
+    }
+
+    public void getTTSLanguages(final boolean recycleResult, final GetLocalesListListener responseListener){
+        if(recycleResult && !ttsLanguages.isEmpty()){
+            responseListener.onSuccess(ttsLanguages);
+        }else{
+            TTS.getSupportedLanguages(this, new TTS.SupportedLanguagesListener() {    //we load TTS languages to catch eventual TTS errors
+                @Override
+                public void onLanguagesListAvailable(ArrayList<CustomLocale> ttsLanguages) {
+                    Global.this.ttsLanguages = ttsLanguages;
+                    responseListener.onSuccess(ttsLanguages);
+                }
+
+                @Override
+                public void onError(int reason) {
+                    responseListener.onSuccess(new ArrayList<>());
                 }
             });
         }

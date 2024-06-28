@@ -325,7 +325,17 @@ public class WalkieTalkieFragment extends VoiceTranslationFragment {
         // save firstLanguage selected
         global.setFirstLanguage(language);
         // change language displayed
-        ((AnimatedTextView) firstLanguageSelector.findViewById(R.id.firstLanguageName)).setText(language.getDisplayName(), true);
+        global.getTTSLanguages(true, new Global.GetLocalesListListener() {
+            @Override
+            public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                ((AnimatedTextView) firstLanguageSelector.findViewById(R.id.firstLanguageName)).setText(language.getDisplayName(ttsLanguages), true);
+            }
+
+            @Override
+            public void onFailure(int[] reasons, long value) {
+                //never called in this case
+            }
+        });
     }
 
     private void setSecondLanguage(CustomLocale language) {
@@ -334,7 +344,17 @@ public class WalkieTalkieFragment extends VoiceTranslationFragment {
         // save secondLanguage selected
         global.setSecondLanguage(language);
         // change language displayed
-        ((AnimatedTextView) secondLanguageSelector.findViewById(R.id.secondLanguageName)).setText(language.getDisplayName(), true);
+        global.getTTSLanguages(true, new Global.GetLocalesListListener() {
+            @Override
+            public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                ((AnimatedTextView) secondLanguageSelector.findViewById(R.id.secondLanguageName)).setText(language.getDisplayName(ttsLanguages), true);
+            }
+
+            @Override
+            public void onFailure(int[] reasons, long value) {
+                //never called in this case
+            }
+        });
     }
 
     private void onFailureShowingList(int[] reasons, long value) {

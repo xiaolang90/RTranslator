@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Set;
 
+import nie.translator.rtranslator.Global;
+
 public class CustomLocale implements Comparable<CustomLocale>, Serializable {
     @NonNull
     private Locale locale;
@@ -153,12 +155,16 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
         return locale.getDisplayVariant(inLocale);
     }
 
-    public String getDisplayName() {
-        if (containsLanguage(TTS.ttsLanguages, CustomLocale.getInstance(locale.getLanguage()))) {
+    public String getDisplayName(ArrayList<CustomLocale> ttsLanguages) {
+        if (containsLanguage(ttsLanguages, CustomLocale.getInstance(locale.getLanguage()))) {
             return locale.getDisplayName();
         } else {
-            return locale.getDisplayName()+" (no TTS)"; // Notice that users cannot use TTS for this language.
+            return locale.getDisplayName()+" (no TTS)";    // Notice that users cannot use TTS for this language.
         }
+    }
+
+    public String getDisplayNameWithoutTTS() {
+        return locale.getDisplayName();
     }
 
     public String getDisplayName(Locale locale) {
@@ -179,7 +185,7 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
 
     @Override
     public int compareTo(CustomLocale o) {
-        return getDisplayName().compareTo(((CustomLocale) o).getDisplayName());
+        return getDisplayNameWithoutTTS().compareTo(((CustomLocale) o).getDisplayNameWithoutTTS());
     }
 
     @Override
@@ -195,7 +201,7 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
 
     public boolean equalsLanguage(CustomLocale locale) {
         if (getLanguage() != null && locale != null && locale.getLanguage() != null) {
-            return getLanguage().equals(locale.getLanguage());
+            return getISO3Language().equals(locale.getISO3Language());
         } else {
             return false;
         }

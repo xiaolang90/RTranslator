@@ -22,6 +22,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+
 import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.tools.BluetoothHeadsetUtils;
 import nie.translator.rtranslator.tools.CustomLocale;
@@ -166,14 +169,24 @@ public class ConversationService extends VoiceTranslationService {
                         translator.translateMessage(conversationMessage, result, TRANSLATOR_BEAM_SIZE, new Translator.TranslateMessageListener() {
                             @Override
                             public void onTranslatedMessage(ConversationMessage conversationMessage, long messageID, boolean isFinal) {
-                                if(isFinal && CustomLocale.containsLanguage(TTS.ttsLanguages, conversationMessage.getPayload().getLanguage())) { // check if the language can be speak
-                                    speak(conversationMessage.getPayload().getText(), conversationMessage.getPayload().getLanguage());
-                                }
-                                message.setText(conversationMessage.getPayload().getText());   // updating the text with the new translated text (and without the language code)
-                                GuiMessage guiMessage = new GuiMessage(message, messageID, false, true);
-                                notifyMessage(guiMessage);
-                                // we save every new message in the exchanged messages so that the fragment can restore them
-                                addOrUpdateMessage(guiMessage);
+                                global.getTTSLanguages(true, new Global.GetLocalesListListener() {
+                                    @Override
+                                    public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                                        if(isFinal && CustomLocale.containsLanguage(ttsLanguages, conversationMessage.getPayload().getLanguage())) { // check if the language can be speak
+                                            speak(conversationMessage.getPayload().getText(), conversationMessage.getPayload().getLanguage());
+                                        }
+                                        message.setText(conversationMessage.getPayload().getText());   // updating the text with the new translated text (and without the language code)
+                                        GuiMessage guiMessage = new GuiMessage(message, messageID, false, true);
+                                        notifyMessage(guiMessage);
+                                        // we save every new message in the exchanged messages so that the fragment can restore them
+                                        addOrUpdateMessage(guiMessage);
+                                    }
+
+                                    @Override
+                                    public void onFailure(int[] reasons, long value) {
+                                        //never called in this case
+                                    }
+                                });
                             }
 
                             @Override

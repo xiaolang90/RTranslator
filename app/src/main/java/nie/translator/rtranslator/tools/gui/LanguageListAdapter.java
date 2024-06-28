@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import java.util.ArrayList;
+
+import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.R;
 import nie.translator.rtranslator.tools.CustomLocale;
 
@@ -31,6 +33,8 @@ public class LanguageListAdapter extends BaseAdapter {
     private CustomLocale selectedLanguage;
     private Activity activity;
     private LayoutInflater inflater;
+    private boolean showTTSInfo = true;
+    private ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
 
     public LanguageListAdapter(Activity activity, ArrayList<CustomLocale> languages, CustomLocale selectedLanguage) {
         this.activity = activity;
@@ -38,6 +42,17 @@ public class LanguageListAdapter extends BaseAdapter {
         this.selectedLanguage = selectedLanguage;
         notifyDataSetChanged();
         inflater = activity.getLayoutInflater();
+        initializeTTSLanguageList(activity);
+    }
+
+    public LanguageListAdapter(Activity activity, boolean showTTSInfo, ArrayList<CustomLocale> languages, CustomLocale selectedLanguage) {
+        this.activity = activity;
+        this.showTTSInfo = showTTSInfo;
+        this.languages = languages;
+        this.selectedLanguage = selectedLanguage;
+        notifyDataSetChanged();
+        inflater = activity.getLayoutInflater();
+        initializeTTSLanguageList(activity);
     }
 
     @Override
@@ -79,7 +94,26 @@ public class LanguageListAdapter extends BaseAdapter {
         } else {
             view.findViewById(R.id.isSelected).setVisibility(View.GONE);
         }
-        ((TextView) view.findViewById(R.id.languageName)).setText(item.getDisplayName());
+        if(showTTSInfo){
+            ((TextView) view.findViewById(R.id.languageName)).setText(item.getDisplayName(ttsLanguages));
+        }else {
+            ((TextView) view.findViewById(R.id.languageName)).setText(item.getDisplayNameWithoutTTS());
+        }
         return view;
+    }
+
+    private void initializeTTSLanguageList(Activity activity){
+        Global global = (Global) activity.getApplication();
+        global.getTTSLanguages(true, new Global.GetLocalesListListener() {
+            @Override
+            public void onSuccess(ArrayList<CustomLocale> ttsLanguages) {
+                LanguageListAdapter.this.ttsLanguages = ttsLanguages;
+            }
+
+            @Override
+            public void onFailure(int[] reasons, long value) {
+                //never called in this case
+            }
+        });
     }
 }

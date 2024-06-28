@@ -382,7 +382,7 @@ public class TranslationFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 listViewGui.setVisibility(View.VISIBLE);
 
-                listView = new LanguageListAdapter(activity, languages, selectedLanguage);
+                listView = new LanguageListAdapter(activity, false, languages, selectedLanguage);
                 listViewGui.setAdapter(listView);
                 listViewGui.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -426,14 +426,14 @@ public class TranslationFragment extends Fragment {
         // save firstLanguage selected
         global.setFirstLanguage(language);
         // change language displayed
-        ((AnimatedTextView) firstLanguageSelector.findViewById(R.id.firstLanguageName)).setText(language.getDisplayName(), true);
+        ((AnimatedTextView) firstLanguageSelector.findViewById(R.id.firstLanguageName)).setText(language.getDisplayNameWithoutTTS(), true);
     }
 
     private void setSecondLanguage(CustomLocale language) {
         // save secondLanguage selected
         global.setSecondLanguage(language);
         // change language displayed
-        ((AnimatedTextView) secondLanguageSelector.findViewById(R.id.secondLanguageName)).setText(language.getDisplayName(), true);
+        ((AnimatedTextView) secondLanguageSelector.findViewById(R.id.secondLanguageName)).setText(language.getDisplayNameWithoutTTS(), true);
     }
 
     private void onFailureShowingList(int[] reasons, long value) {

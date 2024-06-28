@@ -38,6 +38,7 @@ public class TTS {
     private static Thread getSupportedLanguageThread;
     private static ArrayDeque<SupportedLanguagesListener> supportedLanguagesListeners = new ArrayDeque<>();
     private static final Object lock = new Object();
+    private static final ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
 
 
     public TTS(Context context, final InitListener listener) {
@@ -181,8 +182,6 @@ public class TTS {
         }
     }
 
-    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
-
     private static class GetSupportedLanguageRunnable implements Runnable {
         private SupportedLanguagesListener responseListener;
         private Context context;
@@ -211,25 +210,25 @@ public class TTS {
                     } else {
                         quality = Voice.QUALITY_NORMAL;
                     }
-                    boolean foundLanguage = false; // if there is available languages; keep false if our code cannot get its name
+                    boolean foundLanguage = false; // if there is available languages
                     if (set != null) {
                         // we filter the languages that have a tts that reflects the quality characteristics we want
                         for (Voice aSet : set) {
-                            if (aSet.getQuality() >= quality && !aSet.getFeatures().contains("legacySetLanguageVoice")) { //
-                                int i = aSet.getLocale().toString().indexOf("-");
+                            if (aSet.getQuality() >= quality && (qualityLow || !aSet.getFeatures().contains("legacySetLanguageVoice"))) {
                                 CustomLocale language;
-                                if (i != -1) {
+                                if(aSet.getLocale() != null){
                                     language = new CustomLocale(aSet.getLocale()); // Use .getLocale() for google
                                     foundLanguage = true;
-                                } else {
+                                }else{
                                     language = CustomLocale.getInstance(aSet.getName()); // Use .getName() for samsung/huawei (maybe others also)
                                     foundLanguage = true;
                                 }
+
                                 ttsLanguages.add(language);
                             }
                         }
                     }
-                    if (foundLanguage) { // start TTS if the above lines find at least 1 supported language
+                    if (foundLanguage) {    // start TTS if the above lines find at least 1 supported language
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -237,22 +236,22 @@ public class TTS {
                             }
                         });
                     } else {
-                            onError(ErrorCodes.GOOGLE_TTS_ERROR);
-                        }
-                        tempTts.stop();
-                        tempTts.shutdown();
+                        onError(ErrorCodes.GOOGLE_TTS_ERROR);
                     }
+                    tempTts.stop();
+                    tempTts.shutdown();
+                }
 
-                    @Override
-                    public void onError(final int reason) {
-                        mainHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                responseListener.onError(reason);
-                            }
-                        });
-                    }
-                });
+                @Override
+                public void onError(final int reason) {
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            responseListener.onError(reason);
+                        }
+                    });
+                }
+            });
         }
     }
 

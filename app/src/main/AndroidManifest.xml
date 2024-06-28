@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--            https://developer.android.com/reference/android/speech/tts/TextToSpeech-->
+    <!--https://developer.android.com/reference/android/speech/tts/TextToSpeech-->
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
