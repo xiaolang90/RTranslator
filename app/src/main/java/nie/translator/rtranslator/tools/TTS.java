@@ -53,38 +53,38 @@ public class TTS {
                         }
                     }*/
 
-                        /*boolean found = false;*/    //method 2
-                        if (tts != null) {
-                            /*ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
-                            for (int i = 0; i < engines.size() && !found; i++) {
-                                switch (engines.get(i).name) {
-                                    case "com.google.android.tts":
-                                        found = true; // Check Google TTS here.
-                                        break;
-                                    case "com.samsung.SMT": // Check Samsung TTS here.
-                                        found = true;
-                                        break;
-                                    case "com.huawei.hiai": // Check Huawei TTS here.
-                                        found = true;
-                                        break;
-                                }
-                            } // Look forward to supporting more TTS engine.
-                            if (!found) {
-                                tts = null;
-                                listener.onError(ErrorCodes.MISSING_GOOGLE_TTS);
-                            } else {
-                                listener.onInit();
+                    /*boolean found = false;*/    //method 2
+                    if (tts != null) {
+                        /*ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
+                        for (int i = 0; i < engines.size() && !found; i++) {
+                            switch (engines.get(i).name) {
+                                case "com.google.android.tts":
+                                    found = true; // Check Google TTS here.
+                                    break;
+                                case "com.samsung.SMT": // Check Samsung TTS here.
+                                    found = true;
+                                    break;
+                                case "com.huawei.hiai": // Check Huawei TTS here.
+                                    found = true;
+                                    break;
                             }
-                            return;*/
+                        } // Look forward to supporting more TTS engine.
+                        if (!found) {
+                            tts = null;
+                            listener.onError(ErrorCodes.MISSING_GOOGLE_TTS);
+                        } else {
                             listener.onInit();
-                            return; // Set TTS to the default TTS directly.
                         }
+                        return;*/
+                        listener.onInit();
+                        return; // Set TTS to the default TTS directly.
                     }
-                    tts = null;
-                    listener.onError(ErrorCodes.GOOGLE_TTS_ERROR);
                 }
-            },
-            null);// use default TTS when this is null
+                tts = null;
+                listener.onError(ErrorCodes.GOOGLE_TTS_ERROR);
+            }
+        },
+        null);// use default TTS when this is null
     }
 
     public boolean isActive() {
@@ -181,7 +181,7 @@ public class TTS {
         }
     }
 
-    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>(); // Change TTS language list to public
+    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
 
     private static class GetSupportedLanguageRunnable implements Runnable {
         private SupportedLanguagesListener responseListener;
