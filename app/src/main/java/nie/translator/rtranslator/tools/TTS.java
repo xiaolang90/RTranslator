@@ -53,14 +53,20 @@ public class TTS {
                         }
                     }*/
 
-                    boolean found = false;    //method 2
+                    /*boolean found = false;*/    //method 2
                     if (tts != null) {
-                        ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
+                        /*ArrayList<TextToSpeech.EngineInfo> engines = new ArrayList<>(tts.getEngines());
                         for (int i = 0; i < engines.size() && !found; i++) {
-                            if (engines.get(i).name.equals("com.google.android.tts")) {  // Check TTS engine from Google
-                                found = true; // Check Google TTS here.
-                            } else if (engines.get(i).name.equals("com.samsung.SMT")) {  // Check TTS engine from Samsung
-                                found = true;
+                            switch (engines.get(i).name) {
+                                case "com.google.android.tts":
+                                    found = true; // Check Google TTS here.
+                                    break;
+                                case "com.samsung.SMT": // Check Samsung TTS here.
+                                    found = true;
+                                    break;
+                                case "com.huawei.hiai": // Check Huawei TTS here.
+                                    found = true;
+                                    break;
                             }
                         } // Look forward to supporting more TTS engine.
                         if (!found) {
@@ -69,14 +75,16 @@ public class TTS {
                         } else {
                             listener.onInit();
                         }
-                        return;
+                        return;*/
+                        listener.onInit();
+                        return; // Set TTS to the default TTS directly.
                     }
                 }
                 tts = null;
                 listener.onError(ErrorCodes.GOOGLE_TTS_ERROR);
             }
         },
-        null);// "com.google.android.tts" is Google TTS and "com.samsung.SMT" is Samsung TTS
+        null);// use default TTS when this is null
     }
 
     public boolean isActive() {
@@ -173,6 +181,8 @@ public class TTS {
         }
     }
 
+    public static ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
+
     private static class GetSupportedLanguageRunnable implements Runnable {
         private SupportedLanguagesListener responseListener;
         private Context context;
@@ -192,7 +202,6 @@ public class TTS {
             tempTts = new TTS((context), new TTS.InitListener() {    // tts initialization (to be improved, automatic package installation)
                 @Override
                 public void onInit() {
-                    ArrayList<CustomLocale> ttsLanguages = new ArrayList<>();
                     Set<Voice> set = tempTts.getVoices();
                     SharedPreferences sharedPreferences = context.getSharedPreferences("default", Context.MODE_PRIVATE);
                     boolean qualityLow = sharedPreferences.getBoolean("languagesQualityLow", false);
@@ -202,6 +211,7 @@ public class TTS {
                     } else {
                         quality = Voice.QUALITY_NORMAL;
                     }
+                    boolean foundLanguage = false; // if there is available languages; keep false if our code cannot get its name
                     if (set != null) {
                         // we filter the languages that have a tts that reflects the quality characteristics we want
                         for (Voice aSet : set) {
@@ -209,13 +219,17 @@ public class TTS {
                                 int i = aSet.getLocale().toString().indexOf("-");
                                 CustomLocale language;
                                 if (i != -1) {
-                                    language = new CustomLocale(aSet.getLocale()); // Use Google TTS's .getLocale()
+                                    language = new CustomLocale(aSet.getLocale()); // Use .getLocale() for google
+                                    foundLanguage = true;
                                 } else {
-                                    language = CustomLocale.getInstance(aSet.getName()); // Use getName for SMT because Samsung use another Locale format (as "eng_USA_l03") and use Google's Locale format as its name (as "en-US-SMTl03").
+                                    language = CustomLocale.getInstance(aSet.getName()); // Use .getName() for samsung/huawei (maybe others also)
+                                    foundLanguage = true;
                                 }
                                 ttsLanguages.add(language);
                             }
                         }
+                    }
+                    if (foundLanguage) { // start TTS if the above lines find at least 1 supported language
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -223,22 +237,22 @@ public class TTS {
                             }
                         });
                     } else {
-                        onError(ErrorCodes.GOOGLE_TTS_ERROR);
-                    }
-                    tempTts.stop();
-                    tempTts.shutdown();
-                }
-
-                @Override
-                public void onError(final int reason) {
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            responseListener.onError(reason);
+                            onError(ErrorCodes.GOOGLE_TTS_ERROR);
                         }
-                    });
-                }
-            });
+                        tempTts.stop();
+                        tempTts.shutdown();
+                    }
+
+                    @Override
+                    public void onError(final int reason) {
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                responseListener.onError(reason);
+                            }
+                        });
+                    }
+                });
         }
     }
 
